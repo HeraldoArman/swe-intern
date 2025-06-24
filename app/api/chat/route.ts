@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google"; // <-- Gunakan ini
 import { frontendTools } from "@assistant-ui/react-ai-sdk";
 import { streamText } from "ai";
 
@@ -9,14 +9,15 @@ export async function POST(req: Request) {
   const { messages, system, tools } = await req.json();
 
   const result = streamText({
-    model: openai("gpt-4o"),
+
+    model: google("models/gemini-1.5-flash-latest"),
+
     messages,
-    // forward system prompt and tools from the frontend
-    toolCallStreaming: true,
     system,
     tools: {
       ...frontendTools(tools),
     },
+    toolCallStreaming: true,
     onError: console.log,
   });
 
