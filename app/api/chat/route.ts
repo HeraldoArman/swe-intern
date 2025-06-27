@@ -1,4 +1,4 @@
-import { google } from "@ai-sdk/google"; // <-- Gunakan ini
+import { google } from "@ai-sdk/google"; 
 import { frontendTools } from "@assistant-ui/react-ai-sdk";
 import { streamText } from "ai";
 
