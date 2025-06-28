@@ -23,7 +23,11 @@ import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { ToolFallback } from "./tool-fallback";
 
-export const Thread: FC = () => {
+interface ThreadProps {
+  sources: { title: string }[];
+}
+
+export const Thread: FC<ThreadProps> = ({ sources }) => {
   return (
     <ThreadPrimitive.Root
       className="bg-background box-border flex h-full flex-col overflow-hidden"
@@ -45,6 +49,33 @@ export const Thread: FC = () => {
         <ThreadPrimitive.If empty={false}>
           <div className="min-h-8 flex-grow" />
         </ThreadPrimitive.If>
+        {sources.length > 0 && (
+          <div className="p-4 bg-gray-100 rounded-lg mb-4 max-w-[var(--thread-max-width)] w-full">
+            <h4 className="font-semibold text-sm text-gray-700 mb-2">
+              📚 Sumber Materi:
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-1">
+              {sources.map((source, index) => (
+                <div
+                  key={index}
+                  className="bg-white shadow-md rounded-lg overflow-hidden border"
+                >
+                  <div className="p-2 text-sm text-blue-800 font-medium truncate text-center">
+                    <a
+                      href={`/materi/${source.title}`}
+                      download
+                      title={source.title}
+                      className="hover:underline"
+                    >
+                      {source.title}
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="sticky bottom-0 mt-3 flex w-full max-w-[var(--thread-max-width)] flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
           <ThreadScrollToBottom />
@@ -87,22 +118,22 @@ const ThreadWelcomeSuggestions: FC = () => {
     <div className="mt-3 flex w-full items-stretch justify-center gap-4">
       <ThreadPrimitive.Suggestion
         className="hover:bg-muted/80 flex max-w-sm grow basis-0 flex-col items-center justify-center rounded-lg border p-3 transition-colors ease-in"
-        prompt="What is the weather in Tokyo?"
+        prompt="Berikan saya materi pengantar organisasi komputer"
         method="replace"
         autoSend
       >
         <span className="line-clamp-2 text-ellipsis text-sm font-semibold">
-          What is the weather in Tokyo?
+          Berikan saya materi pengantar organisasi komputer
         </span>
       </ThreadPrimitive.Suggestion>
       <ThreadPrimitive.Suggestion
         className="hover:bg-muted/80 flex max-w-sm grow basis-0 flex-col items-center justify-center rounded-lg border p-3 transition-colors ease-in"
-        prompt="What is assistant-ui?"
+        prompt="Jelaskan apa itu vektor"
         method="replace"
         autoSend
       >
         <span className="line-clamp-2 text-ellipsis text-sm font-semibold">
-          What is assistant-ui?
+          Jelaskan apa itu vektor
         </span>
       </ThreadPrimitive.Suggestion>
     </div>
