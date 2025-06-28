@@ -6,8 +6,7 @@ import { Thread } from "@/components/assistant-ui/thread";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+} from "@/components/assistant-ui/sidebar";
 import { useState } from "react";
 
 export const Assistant = () => {
@@ -27,6 +26,7 @@ export const Assistant = () => {
         }
       }
     },
+    
   });
 
   return (
@@ -34,7 +34,7 @@ export const Assistant = () => {
       <SidebarProvider>
         <SidebarInset>
 
-          <Thread sources={sources}/>
+        <Thread sources={sources} />
         </SidebarInset>
       </SidebarProvider>
     </AssistantRuntimeProvider>

@@ -15,6 +15,10 @@ import {
   PencilIcon,
   RefreshCwIcon,
   SendHorizontalIcon,
+  StopCircle,
+  User,
+  Bot,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { ToolFallback } from "./tool-fallback";
+import { title } from "process";
 
 interface ThreadProps {
   sources: { title: string }[];
@@ -29,59 +34,38 @@ interface ThreadProps {
 
 export const Thread: FC<ThreadProps> = ({ sources }) => {
   return (
-    <ThreadPrimitive.Root
-      className="bg-background box-border flex h-full flex-col overflow-hidden"
-      style={{
-        ["--thread-max-width" as string]: "42rem",
-      }}
-    >
-      <ThreadPrimitive.Viewport className="flex h-full flex-col items-center overflow-y-scroll scroll-smooth bg-inherit px-4 pt-8">
-        <ThreadWelcome />
-
-        <ThreadPrimitive.Messages
-          components={{
-            UserMessage: UserMessage,
-            EditComposer: EditComposer,
-            AssistantMessage: AssistantMessage,
-          }}
-        />
-
-        <ThreadPrimitive.If empty={false}>
-          <div className="min-h-8 flex-grow" />
-        </ThreadPrimitive.If>
-        {sources.length > 0 && (
-          <div className="p-4 bg-gray-100 rounded-lg mb-4 max-w-[var(--thread-max-width)] w-full">
-            <h4 className="font-semibold text-sm text-gray-700 mb-2">
-              📚 Sumber Materi:
-            </h4>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-1">
-              {sources.map((source, index) => (
-                <div
-                  key={index}
-                  className="bg-white shadow-md rounded-lg overflow-hidden border"
-                >
-                  <div className="p-2 text-sm text-blue-800 font-medium truncate text-center">
-                    <a
-                      href={`/materi/${source.title}`}
-                      download
-                      title={source.title}
-                      className="hover:underline"
-                    >
-                      {source.title}
-                    </a>
-                  </div>
-                </div>
-              ))}
+    <ThreadPrimitive.Root className="flex h-full flex-col bg-background">
+      <div className="flex-1 overflow-hidden">
+        <ThreadPrimitive.Viewport className="h-full overflow-y-auto">
+          <div className="mx-auto max-w-4xl px-4">
+            <ThreadWelcome />
+            <div className="pt-6">
+              <ThreadPrimitive.Messages
+                components={{
+                  UserMessage: UserMessage,
+                  EditComposer: EditComposer,
+                  AssistantMessage: AssistantMessage,
+                }}
+              />
             </div>
+            <ThreadPrimitive.If empty={false}>
+              <div className="h-4" />
+            </ThreadPrimitive.If>
+            {sources.length > 0 && (
+              <div className="mb-1">
+                <SourcesDisplay sources={sources} />
+              </div>
+            )}
           </div>
-        )}
+        </ThreadPrimitive.Viewport>
+      </div>
 
-        <div className="sticky bottom-0 mt-3 flex w-full max-w-[var(--thread-max-width)] flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
+      <div className="border-t border-border/50 bg-background/80 backdrop-blur-sm">
+        <div className="mx-auto max-w-4xl p-4">
           <ThreadScrollToBottom />
           <Composer />
         </div>
-      </ThreadPrimitive.Viewport>
+      </div>
     </ThreadPrimitive.Root>
   );
 };
@@ -92,9 +76,9 @@ const ThreadScrollToBottom: FC = () => {
       <TooltipIconButton
         tooltip="Scroll to bottom"
         variant="outline"
-        className="absolute -top-8 rounded-full disabled:invisible"
+        className="absolute bottom-20 right-6 z-10 h-10 w-10 rounded-full bg-background shadow-lg border-border/50 disabled:invisible"
       >
-        <ArrowDownIcon />
+        <ArrowDownIcon className="h-4 w-4" />
       </TooltipIconButton>
     </ThreadPrimitive.ScrollToBottom>
   );
@@ -103,10 +87,20 @@ const ThreadScrollToBottom: FC = () => {
 const ThreadWelcome: FC = () => {
   return (
     <ThreadPrimitive.Empty>
-      <div className="flex w-full max-w-[var(--thread-max-width)] flex-grow flex-col">
-        <div className="flex w-full flex-grow flex-col items-center justify-center">
-          <p className="mt-4 font-medium">How can I help you today?</p>
+      <div className="flex h-full flex-col items-center justify-center py-12">
+        <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600">
+          <Sparkles className="h-10 w-10 text-white" />
         </div>
+
+        <h1 className="mb-4 text-3xl font-bold text-foreground">
+          How can I help you today?
+        </h1>
+
+        <p className="mb-8 text-center text-muted-foreground max-w-md">
+          I'm your AI assistant powered by advanced language models. Ask me
+          anything!
+        </p>
+
         <ThreadWelcomeSuggestions />
       </div>
     </ThreadPrimitive.Empty>
@@ -114,43 +108,65 @@ const ThreadWelcome: FC = () => {
 };
 
 const ThreadWelcomeSuggestions: FC = () => {
+  const suggestions = [
+    {
+      title: "Pengantar Organisasi Komputer",
+      prompt: "Berikan saya materi pengantar organisasi komputer",
+    },
+    {
+      title: "Konsep Vektor",
+      prompt: "Jelaskan apa itu vektor",
+    },
+    {
+      title: "Pemrograman Java",
+      prompt: "Tolong berikan saya contoh kode sederhana dalam Java",
+    },
+    {
+      title: "Ruang Eigen",
+      prompt: "Berikan contoh soal ruang eigen",
+    },
+  ];
+
   return (
-    <div className="mt-3 flex w-full items-stretch justify-center gap-4">
-      <ThreadPrimitive.Suggestion
-        className="hover:bg-muted/80 flex max-w-sm grow basis-0 flex-col items-center justify-center rounded-lg border p-3 transition-colors ease-in"
-        prompt="Berikan saya materi pengantar organisasi komputer"
-        method="replace"
-        autoSend
-      >
-        <span className="line-clamp-2 text-ellipsis text-sm font-semibold">
-          Berikan saya materi pengantar organisasi komputer
-        </span>
-      </ThreadPrimitive.Suggestion>
-      <ThreadPrimitive.Suggestion
-        className="hover:bg-muted/80 flex max-w-sm grow basis-0 flex-col items-center justify-center rounded-lg border p-3 transition-colors ease-in"
-        prompt="Jelaskan apa itu vektor"
-        method="replace"
-        autoSend
-      >
-        <span className="line-clamp-2 text-ellipsis text-sm font-semibold">
-          Jelaskan apa itu vektor
-        </span>
-      </ThreadPrimitive.Suggestion>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+      {suggestions.map((suggestion, index) => (
+        <ThreadPrimitive.Suggestion
+          key={index}
+          className="group relative overflow-hidden rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-border hover:shadow-md hover:scale-[1.02]"
+          prompt={suggestion.prompt}
+          method="replace"
+          autoSend
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative">
+            <h3 className="font-medium text-sm text-foreground mb-1">
+              {suggestion.title}
+            </h3>
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              {suggestion.prompt}
+            </p>
+          </div>
+        </ThreadPrimitive.Suggestion>
+      ))}
     </div>
   );
 };
 
 const Composer: FC = () => {
   return (
-    <ComposerPrimitive.Root className="focus-within:border-ring/20 flex w-full flex-wrap items-end rounded-lg border bg-inherit px-2.5 shadow-sm transition-colors ease-in">
-      <ComposerPrimitive.Input
-        rows={1}
-        autoFocus
-        placeholder="Write a message..."
-        className="placeholder:text-muted-foreground max-h-40 flex-grow resize-none border-none bg-transparent px-2 py-4 text-sm outline-none focus:ring-0 disabled:cursor-not-allowed"
-      />
-      <ComposerAction />
-    </ComposerPrimitive.Root>
+    <div className="relative">
+      <ComposerPrimitive.Root className="relative flex min-h-[60px] w-full items-end rounded-2xl border border-border/50 bg-background shadow-sm transition-all focus-within:border-ring/50 focus-within:shadow-md">
+        <ComposerPrimitive.Input
+          rows={1}
+          autoFocus
+          placeholder="Message AI Assistant..."
+          className="flex-1 resize-none border-0 bg-transparent px-4 py-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-0 max-h-32"
+        />
+        <div className="flex items-center gap-2 p-2">
+          <ComposerAction />
+        </div>
+      </ComposerPrimitive.Root>
+    </div>
   );
 };
 
@@ -160,22 +176,22 @@ const ComposerAction: FC = () => {
       <ThreadPrimitive.If running={false}>
         <ComposerPrimitive.Send asChild>
           <TooltipIconButton
-            tooltip="Send"
+            tooltip="Send message"
             variant="default"
-            className="my-2.5 size-8 p-2 transition-opacity ease-in"
+            className="h-10 w-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0"
           >
-            <SendHorizontalIcon />
+            <SendHorizontalIcon className="h-4 w-4" />
           </TooltipIconButton>
         </ComposerPrimitive.Send>
       </ThreadPrimitive.If>
       <ThreadPrimitive.If running>
         <ComposerPrimitive.Cancel asChild>
           <TooltipIconButton
-            tooltip="Cancel"
-            variant="default"
-            className="my-2.5 size-8 p-2 transition-opacity ease-in"
+            tooltip="Stop generating"
+            variant="outline"
+            className="h-10 w-10 rounded-xl"
           >
-            <CircleStopIcon />
+            <StopCircle className="h-4 w-4" />
           </TooltipIconButton>
         </ComposerPrimitive.Cancel>
       </ThreadPrimitive.If>
@@ -185,14 +201,19 @@ const ComposerAction: FC = () => {
 
 const UserMessage: FC = () => {
   return (
-    <MessagePrimitive.Root className="grid auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] gap-y-2 [&:where(>*)]:col-start-2 w-full max-w-[var(--thread-max-width)] py-4">
-      <UserActionBar />
-
-      <div className="bg-muted text-foreground max-w-[calc(var(--thread-max-width)*0.8)] break-words rounded-3xl px-5 py-2.5 col-start-2 row-start-2">
-        <MessagePrimitive.Content />
+    <MessagePrimitive.Root className="group relative mb-6 flex justify-end">
+      <div className="flex max-w-[80%] items-start gap-3">
+        <UserActionBar />
+        <div className="flex flex-col items-end gap-2">
+          <div className="rounded-2xl rounded-tr-md bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3 text-white shadow-sm">
+            <MessagePrimitive.Content />
+          </div>
+          <BranchPicker className="mr-2" />
+        </div>
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+          <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+        </div>
       </div>
-
-      <BranchPicker className="col-span-full col-start-1 row-start-3 -mr-1 justify-end" />
     </MessagePrimitive.Root>
   );
 };
@@ -202,11 +223,15 @@ const UserActionBar: FC = () => {
     <ActionBarPrimitive.Root
       hideWhenRunning
       autohide="not-last"
-      className="flex flex-col items-end col-start-1 row-start-2 mr-3 mt-2.5"
+      className="flex opacity-0 group-hover:opacity-100 transition-opacity"
     >
       <ActionBarPrimitive.Edit asChild>
-        <TooltipIconButton tooltip="Edit">
-          <PencilIcon />
+        <TooltipIconButton
+          tooltip="Edit message"
+          variant="ghost"
+          className="h-8 w-8"
+        >
+          <PencilIcon className="h-3 w-3" />
         </TooltipIconButton>
       </ActionBarPrimitive.Edit>
     </ActionBarPrimitive.Root>
@@ -215,15 +240,16 @@ const UserActionBar: FC = () => {
 
 const EditComposer: FC = () => {
   return (
-    <ComposerPrimitive.Root className="bg-muted my-4 flex w-full max-w-[var(--thread-max-width)] flex-col gap-2 rounded-xl">
-      <ComposerPrimitive.Input className="text-foreground flex h-8 w-full resize-none bg-transparent p-4 pb-0 outline-none" />
-
-      <div className="mx-3 mb-3 flex items-center justify-center gap-2 self-end">
+    <ComposerPrimitive.Root className="mb-4 rounded-2xl border border-border bg-background p-4">
+      <ComposerPrimitive.Input className="w-full resize-none border-0 bg-transparent text-sm focus:outline-none focus:ring-0" />
+      <div className="mt-3 flex justify-end gap-2">
         <ComposerPrimitive.Cancel asChild>
-          <Button variant="ghost">Cancel</Button>
+          <Button variant="ghost" size="sm">
+            Cancel
+          </Button>
         </ComposerPrimitive.Cancel>
         <ComposerPrimitive.Send asChild>
-          <Button>Send</Button>
+          <Button size="sm">Save & Send</Button>
         </ComposerPrimitive.Send>
       </div>
     </ComposerPrimitive.Root>
@@ -232,16 +258,28 @@ const EditComposer: FC = () => {
 
 const AssistantMessage: FC = () => {
   return (
-    <MessagePrimitive.Root className="grid grid-cols-[auto_auto_1fr] grid-rows-[auto_1fr] relative w-full max-w-[var(--thread-max-width)] py-4">
-      <div className="text-foreground max-w-[calc(var(--thread-max-width)*0.8)] break-words leading-7 col-span-2 col-start-2 row-start-1 my-1.5">
-        <MessagePrimitive.Content
-          components={{ Text: MarkdownText, tools: { Fallback: ToolFallback } }}
-        />
+    <MessagePrimitive.Root className="group relative mb-6 animate-fade-in">
+      <div className="flex items-start gap-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600">
+          <Bot className="h-4 w-4 text-white" />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="rounded-2xl rounded-tl-md bg-card border border-border/50 px-4 py-3 shadow-sm">
+            <MessagePrimitive.Content
+              components={{
+                Text: MarkdownText,
+                tools: { Fallback: ToolFallback },
+              }}
+            />
+          </div>
+
+          <div className="mt-2 flex items-center gap-2">
+            <AssistantActionBar />
+            <BranchPicker />
+          </div>
+        </div>
       </div>
-
-      <AssistantActionBar />
-
-      <BranchPicker className="col-start-2 row-start-2 -ml-2 mr-2" />
     </MessagePrimitive.Root>
   );
 };
@@ -251,22 +289,30 @@ const AssistantActionBar: FC = () => {
     <ActionBarPrimitive.Root
       hideWhenRunning
       autohide="not-last"
-      autohideFloat="single-branch"
-      className="text-muted-foreground flex gap-1 col-start-3 row-start-2 -ml-1 data-[floating]:bg-background data-[floating]:absolute data-[floating]:rounded-md data-[floating]:border data-[floating]:p-1 data-[floating]:shadow-sm"
+      className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
     >
       <ActionBarPrimitive.Copy asChild>
-        <TooltipIconButton tooltip="Copy">
+        <TooltipIconButton
+          tooltip="Copy message"
+          variant="ghost"
+          className="h-8 w-8"
+        >
           <MessagePrimitive.If copied>
-            <CheckIcon />
+            <CheckIcon className="h-3 w-3" />
           </MessagePrimitive.If>
           <MessagePrimitive.If copied={false}>
-            <CopyIcon />
+            <CopyIcon className="h-3 w-3" />
           </MessagePrimitive.If>
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
+
       <ActionBarPrimitive.Reload asChild>
-        <TooltipIconButton tooltip="Refresh">
-          <RefreshCwIcon />
+        <TooltipIconButton
+          tooltip="Regenerate"
+          variant="ghost"
+          className="h-8 w-8"
+        >
+          <RefreshCwIcon className="h-3 w-3" />
         </TooltipIconButton>
       </ActionBarPrimitive.Reload>
     </ActionBarPrimitive.Root>
@@ -281,38 +327,62 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
     <BranchPickerPrimitive.Root
       hideWhenSingleBranch
       className={cn(
-        "text-muted-foreground inline-flex items-center text-xs",
+        "flex items-center gap-1 text-xs text-muted-foreground",
         className
       )}
       {...rest}
     >
       <BranchPickerPrimitive.Previous asChild>
-        <TooltipIconButton tooltip="Previous">
-          <ChevronLeftIcon />
+        <TooltipIconButton
+          tooltip="Previous"
+          variant="ghost"
+          className="h-6 w-6"
+        >
+          <ChevronLeftIcon className="h-3 w-3" />
         </TooltipIconButton>
       </BranchPickerPrimitive.Previous>
-      <span className="font-medium">
+
+      <span className="text-xs font-medium">
         <BranchPickerPrimitive.Number /> / <BranchPickerPrimitive.Count />
       </span>
+
       <BranchPickerPrimitive.Next asChild>
-        <TooltipIconButton tooltip="Next">
-          <ChevronRightIcon />
+        <TooltipIconButton tooltip="Next" variant="ghost" className="h-6 w-6">
+          <ChevronRightIcon className="h-3 w-3" />
         </TooltipIconButton>
       </BranchPickerPrimitive.Next>
     </BranchPickerPrimitive.Root>
   );
 };
 
-const CircleStopIcon = () => {
+const SourcesDisplay: FC<{ sources: { title: string }[] }> = ({ sources }) => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      width="16"
-      height="16"
-    >
-      <rect width="10" height="10" x="3" y="3" rx="2" />
-    </svg>
+    <div className="rounded-xl border border-border/50 bg-card p-4 shadow-sm">
+      <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
+        <Bot className="h-4 w-4" />
+        📚 Sumber Materi
+      </h4>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {sources.map((source, index) => (
+          <div
+            key={index}
+            className="group relative overflow-hidden rounded-lg border border-border/50 bg-background p-3 transition-all hover:border-border hover:shadow-sm"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <a
+                href={`/materi/${source.title}`}
+                download
+                className="block text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 truncate"
+                title={source.title}
+              >
+                {source.title}
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };

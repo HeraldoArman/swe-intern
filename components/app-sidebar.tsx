@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/assistant-ui/sidebar"
 import { ThreadList } from "./assistant-ui/thread-list"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
