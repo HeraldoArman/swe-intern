@@ -25,6 +25,19 @@ export const Assistant = () => {
           console.error("Failed to parse sources:", error);
         }
       }
+
+      if (response.status !== 200) {
+        console.error("Response error:", response.statusText);
+        alert(
+          "An error occurred while processing your request. Please try again."
+        );
+        throw new Error(response.statusText);
+      }
+      
+    },
+    onError: (error) => {
+      alert("An error occurred: " + error.message);
+      console.error("Error in chat runtime:", error.message);
     },
     
   });

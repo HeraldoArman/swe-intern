@@ -26,7 +26,6 @@ import { Button } from "@/components/ui/button";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { ToolFallback } from "./tool-fallback";
-import { title } from "process";
 
 interface ThreadProps {
   sources: { title: string }[];
@@ -97,8 +96,7 @@ const ThreadWelcome: FC = () => {
         </h1>
 
         <p className="mb-8 text-center text-muted-foreground max-w-md">
-          I'm your AI assistant powered by advanced language models. Ask me
-          anything!
+          I&apos;m your AI assistant powered by advanced language models. Ask me anything!
         </p>
 
         <ThreadWelcomeSuggestions />
