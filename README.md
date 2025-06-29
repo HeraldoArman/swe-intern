@@ -2,6 +2,7 @@
 
 This repository contains a Next.js 15 web application that functions as a Copilot Learning Assistant Chatbot. This project was developed as an assignment for the Software Engineer Intern (Summer 2025) position at gradient.academy.
 
+Deployment Link: [https://swe-intern.vercel.app/](https://swe-intern.vercel.app/)
 
 ## Technologies Used
 
